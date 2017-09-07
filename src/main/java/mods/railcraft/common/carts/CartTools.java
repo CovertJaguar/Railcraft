@@ -18,8 +18,10 @@ import mods.railcraft.api.core.items.IMinecartItem;
 import mods.railcraft.common.blocks.tracks.TrackTools;
 import mods.railcraft.common.plugins.forge.PlayerPlugin;
 import mods.railcraft.common.util.inventory.InvTools;
+import mods.railcraft.common.util.inventory.wrappers.IInventoryComposite;
 import mods.railcraft.common.util.misc.Game;
 import mods.railcraft.common.util.misc.MiscTools;
+import mods.railcraft.common.util.misc.Predicates;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -34,9 +36,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -116,6 +120,16 @@ public class CartTools {
         }
         ItemStack cartItem = cart.getCartItem();
         return !InvTools.isEmpty(stack) && InvTools.isCartItemEqual(stack, cartItem, true);
+    }
+
+    /**
+     * Matches carts from a filter inventory.
+     *
+     * @param composite The filter inventory
+     * @return The cart checker
+     */
+    public static Predicate<EntityMinecart> matchesCartsIfFiltered(IInventoryComposite composite) {
+        return (cart) -> composite.stackStream().anyMatch((stack) -> doesCartMatchFilter(stack, cart));
     }
 
     public static void explodeCart(EntityMinecart cart) {
@@ -233,7 +247,15 @@ public class CartTools {
      * @return EntityMinecart
      */
     @Nullable
-    public static EntityMinecart getCartFromUUID(World world, UUID id) {
+    public static EntityMinecart getCartFromUUID(@Nullable World world, @Nullable UUID id) {
+        if (world == null) {
+            Game.log(Level.ERROR, "Getting cart without a world!", new Throwable("Stacktrace"));
+            return null;
+        }
+        if (id == null) {
+            return null;
+        }
+
         if (world instanceof WorldServer) {
             Entity entity = ((WorldServer) world).getEntityFromUuid(id);
             if (entity instanceof EntityMinecart && entity.isEntityAlive()) {

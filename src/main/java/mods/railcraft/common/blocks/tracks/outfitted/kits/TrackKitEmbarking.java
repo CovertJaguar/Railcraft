@@ -79,7 +79,7 @@ public class TrackKitEmbarking extends TrackKitPowered implements IGuiReturnHand
     public boolean blockActivated(EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem) {
         if (!InvTools.isEmpty(heldItem) && heldItem.getItem() instanceof IToolCrowbar) {
             IToolCrowbar crowbar = (IToolCrowbar) heldItem.getItem();
-            GuiHandler.openGui(EnumGui.TRACK_EMBARKING, player, theWorldAsserted(), getPos().getX(), getPos().getY(), getPos().getZ());
+            GuiHandler.openGui(EnumGui.TRACK_EMBARKING, player, theWorldAsserted(), getPos());
             crowbar.onWhack(player, hand, heldItem, getPos());
             return true;
         }

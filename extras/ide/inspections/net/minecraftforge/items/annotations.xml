@@ -1,0 +1,11 @@
+<root>
+    <item name='net.minecraftforge.items.IItemHandler net.minecraft.item.ItemStack extractItem(int, int, boolean)'>
+        <annotation name='org.jetbrains.annotations.Nullable'/>
+    </item>
+    <item name='net.minecraftforge.items.IItemHandler net.minecraft.item.ItemStack getStackInSlot(int)'>
+        <annotation name='org.jetbrains.annotations.Nullable'/>
+    </item>
+    <item name='net.minecraftforge.items.IItemHandler net.minecraft.item.ItemStack insertItem(int, net.minecraft.item.ItemStack, boolean)'>
+        <annotation name='org.jetbrains.annotations.Nullable'/>
+    </item>
+</root>

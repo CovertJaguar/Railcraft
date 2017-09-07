@@ -8,6 +8,8 @@
  */
 package mods.railcraft.common.util.inventory;
 
+import mods.railcraft.api.tracks.ITrackKitInstance;
+import mods.railcraft.common.util.inventory.filters.StackFilters;
 import net.minecraft.inventory.IInventory;
 
 /**
@@ -17,38 +19,35 @@ import net.minecraft.inventory.IInventory;
  *
  * @author CovertJaguar <http://www.railcraft.info>
  */
-public class PhantomInventory extends StandaloneInventory
-{
+public class PhantomInventory extends StandaloneInventory {
 
-    public PhantomInventory(int size, String name, IInventory callback)
-    {
+    public PhantomInventory(int size, String name, IInventory callback) {
         super(size, name, callback);
     }
 
-    public PhantomInventory(int size, IInventory callback)
-    {
+    public PhantomInventory(int size, IInventory callback) {
         super(size, null, callback);
     }
 
-    public PhantomInventory(int size, String name)
-    {
+    public PhantomInventory(int size, ITrackKitInstance callback) {
+        super(size, null, callback);
+    }
+
+    public PhantomInventory(int size, String name) {
         super(size, name);
     }
 
-    public PhantomInventory(int size)
-    {
-        super(size, null, (IInventory)null);
+    public PhantomInventory(int size) {
+        super(size, null, (IInventory) null);
     }
 
     @Override
-    protected String invTypeName()
-    {
+    protected String invTypeName() {
         return "Phantom";
     }
 
     @Override
-    public int getInventoryStackLimit()
-    {
+    public int getInventoryStackLimit() {
         return 127;
     }
 }

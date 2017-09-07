@@ -42,7 +42,8 @@ import javax.annotation.Nullable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.util.BitSet;
 import java.util.List;
 import java.util.UUID;
@@ -51,41 +52,31 @@ import java.util.UUID;
  * @author CovertJaguar <http://www.railcraft.info/>
  */
 public class TrackKitLocking extends TrackKitRailcraft implements ITrackKitLockdown, ITrackKitPowered {
-//    public static final PropertyEnum<LockingProfileType> PROFILE = PropertyEnum.create("profile", LockingProfileType.class);
-
     public static double START_BOOST = 0.04;
     public static double BOOST_FACTOR = 0.06;
     private LockingProfileType profile = LockingProfileType.LOCKDOWN;
     private LockingProfile profileInstance = profile.create(this);
-    private EntityMinecart currentCart, prevCart;
+    @Nullable
+    private EntityMinecart currentCart;
+    @Nullable
+    private EntityMinecart prevCart;
+    @Nullable
     private Train currentTrain;
     private UUID uuid;
     private boolean trainLeaving;
     private boolean redstone;
     private boolean locked;
     private int trainDelay;
-    // Temporary variables to hold loaded data while we restore from NBT
-    private UUID prevCartUUID;
-    private UUID currentCartUUID;
-    private boolean justLoaded = true;
 
     @Override
     public TrackKits getTrackKitContainer() {
         return TrackKits.LOCKING;
     }
 
-//    @Override
-//    public IExtendedBlockState getExtendedState(IExtendedBlockState state) {
-//        state = super.getExtendedState(state);
-////        state.withProperty(PROFILE, profile);
-////        state.withProperty(ITrackKitPowered.POWERED, !locked);
-//        return state;
-//    }
-
     @Override
     public int getRenderState() {
         int state = profile.ordinal();
-        if (!justLoaded && !locked)
+        if (!locked)
             state += LockingProfileType.VALUES.length;
         return state;
     }
@@ -99,7 +90,7 @@ public class TrackKitLocking extends TrackKitRailcraft implements ITrackKitLockd
             return;
         profile = type;
         profileInstance = profile.create(this);
-        if (getTile() != null && Game.isHost(theWorldAsserted()))
+        if (Game.isHost(theWorldAsserted()))
             sendUpdateToClient();
     }
 
@@ -114,17 +105,6 @@ public class TrackKitLocking extends TrackKitRailcraft implements ITrackKitLockd
         World world = theWorldAsserted();
         if (Game.isHost(world)) {
             boolean updateClient = false; // flag determines whether we send an update to the client, only update when visible changes occur
-
-            // At the time we read from NBT, the chunk has not been fully loaded so we cannot
-            // lookup the carts by UUID in readFromNBT(). We must wait until update(), which
-            // occurs after the chunk is loaded. The justLoaded flag lets us lookup
-            // the carts only after restoring from NBT.
-            if (justLoaded) {
-                prevCart = CartTools.getCartFromUUID(world, prevCartUUID);
-                currentCart = CartTools.getCartFromUUID(world, currentCartUUID);
-                justLoaded = false;
-                updateClient = true;
-            }
 
             if (currentCart != null && !currentCart.isEntityAlive()) {
                 releaseCurrentCart();
@@ -149,6 +129,8 @@ public class TrackKitLocking extends TrackKitRailcraft implements ITrackKitLockd
 
             if (updateClient)
                 sendUpdateToClient();
+
+            markDirty();
         }
     }
 
@@ -349,12 +331,10 @@ public class TrackKitLocking extends TrackKitRailcraft implements ITrackKitLockd
         if (data.hasKey("trainDelay"))
             trainDelay = data.getInteger("trainDelay");
 
-        prevCartUUID = NBTPlugin.readUUID(data, "prevCart");
-        currentCartUUID = NBTPlugin.readUUID(data, "currentCart");
+        prevCart = CartTools.getCartFromUUID(theWorld(), NBTPlugin.readUUID(data, "prevCart"));
+        currentCart = CartTools.getCartFromUUID(theWorld(), NBTPlugin.readUUID(data, "currentCart"));
 
         uuid = NBTPlugin.readUUID(data, "uuid");
-
-        justLoaded = true; // This signals update() to dereference the cart UUID's we read in here
     }
 
     @Override
@@ -365,7 +345,6 @@ public class TrackKitLocking extends TrackKitRailcraft implements ITrackKitLockd
         BitSet bits = new BitSet();
         bits.set(0, redstone);
         bits.set(1, locked);
-        bits.set(2, justLoaded);
         data.write(bits.toByteArray());
 
         profileInstance.writePacketData(data);
@@ -383,10 +362,14 @@ public class TrackKitLocking extends TrackKitRailcraft implements ITrackKitLockd
         BitSet bits = BitSet.valueOf(new byte[]{data.readByte()});
         redstone = bits.get(0);
         locked = bits.get(1);
-        justLoaded = bits.get(2);
         profileInstance.readPacketData(data);
 
         markBlockNeedsUpdate();
+    }
+
+    @Override
+    public void markDirty() {
+        theWorldAsserted().markChunkDirty(getPos(), null);
     }
 
     private enum LockType {
@@ -407,10 +390,16 @@ public class TrackKitLocking extends TrackKitRailcraft implements ITrackKitLockd
         public static final LockingProfileType[] VALUES = values();
         public final LockType lockType;
         public final String tag;
-        private final Class<? extends LockingProfile> profileClass;
+        private final MethodHandle constructor;
 
+        @SuppressWarnings("JavaReflectionMemberAccess")
         LockingProfileType(Class<? extends LockingProfile> profileClass, LockType lockType, String tag) {
-            this.profileClass = profileClass;
+            try {
+                this.constructor = MethodHandles.lookup().unreflectConstructor(profileClass.getConstructor(TrackKitLocking.class));
+            } catch (NoSuchMethodException | IllegalAccessException e) {
+                Game.logThrowable("Error initializing locking track kit!", e);
+                throw new RuntimeException(e);
+            }
             this.lockType = lockType;
             this.tag = tag;
         }
@@ -431,8 +420,7 @@ public class TrackKitLocking extends TrackKitRailcraft implements ITrackKitLockd
 
         public LockingProfile create(TrackKitLocking track) {
             try {
-                Constructor<? extends LockingProfile> con = profileClass.getConstructor(TrackKitLocking.class);
-                return con.newInstance(track);
+                return (LockingProfile) constructor.invoke(track);
             } catch (Throwable ex) {
                 Game.logThrowable("Failed to create Locking Profile!", 10, ex);
                 throw new RuntimeException(ex);

@@ -313,7 +313,7 @@ public class TileRockCrusher extends TileMultiBlockInventory implements IEnergyR
     public boolean openGui(EntityPlayer player) {
         TileMultiBlock mBlock = getMasterBlock();
         if (mBlock != null) {
-            GuiHandler.openGui(EnumGui.ROCK_CRUSHER, player, worldObj, mBlock.getPos().getX(), mBlock.getPos().getY(), mBlock.getPos().getZ());
+            GuiHandler.openGui(EnumGui.ROCK_CRUSHER, player, worldObj, mBlock.getPos());
             return true;
         }
         return false;

@@ -84,7 +84,7 @@ public class TileTradeStation extends TileMachineItem implements IGuiReturnHandl
 
     @Override
     public boolean openGui(EntityPlayer player) {
-        GuiHandler.openGui(EnumGui.TRADE_STATION, player, worldObj, getPos().getX(), getPos().getY(), getPos().getZ());
+        GuiHandler.openGui(EnumGui.TRADE_STATION, player, worldObj, getPos());
         return true;
     }
 

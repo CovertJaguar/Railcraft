@@ -74,7 +74,8 @@ public enum EnumGui {
     BOILER_SOLID(true),
     BOILER_LIQUID(true),
     TURBINE(true),
-    ANVIL(true);
+    ANVIL(true),
+    TRACK_DUMPING(true);
     private static final EnumGui[] VALUES = values();
     private final boolean hasContainer;
 

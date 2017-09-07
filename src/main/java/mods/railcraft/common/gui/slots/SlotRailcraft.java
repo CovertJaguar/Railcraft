@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
  */
 public class SlotRailcraft extends Slot {
 
+    @Nullable
     protected ToolTip toolTips;
     protected boolean isPhantom;
     protected boolean canAdjustPhantom = true;
@@ -34,6 +35,7 @@ public class SlotRailcraft extends Slot {
     /**
      * @return the toolTips
      */
+    @Nullable
     public ToolTip getToolTip() {
         return toolTips;
     }

@@ -49,11 +49,11 @@ public class TrackKitLauncher extends TrackKitPowered implements IGuiReturnHandl
     }
 
     @Override
-    public boolean blockActivated(EntityPlayer player, EnumHand hand, ItemStack heldItem) {
+    public boolean blockActivated(EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem) {
         if (!InvTools.isEmpty(heldItem) && heldItem.getItem() instanceof IToolCrowbar) {
             IToolCrowbar crowbar = (IToolCrowbar) heldItem.getItem();
             if (crowbar.canWhack(player, hand, heldItem, getPos())) {
-                GuiHandler.openGui(EnumGui.TRACK_LAUNCHER, player, theWorldAsserted(), getPos().getX(), getPos().getY(), getPos().getZ());
+                GuiHandler.openGui(EnumGui.TRACK_LAUNCHER, player, theWorldAsserted(), getPos());
                 crowbar.onWhack(player, hand, heldItem, getPos());
                 return true;
             }

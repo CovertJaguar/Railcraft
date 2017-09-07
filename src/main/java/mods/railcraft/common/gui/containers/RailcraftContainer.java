@@ -34,7 +34,7 @@ import static mods.railcraft.common.util.inventory.InvTools.*;
 public abstract class RailcraftContainer extends Container {
     @Nullable
     private final IInventory callback;
-    private final List<Widget> widgets = new ArrayList<Widget>();
+    private final List<Widget> widgets = new ArrayList<>();
 
     protected RailcraftContainer(IInventory inv) {
         this.callback = inv;

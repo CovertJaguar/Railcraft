@@ -10,6 +10,7 @@
 package mods.railcraft.common.util.inventory;
 
 import com.google.common.collect.Iterators;
+import mods.railcraft.api.tracks.ITrackKitInstance;
 import mods.railcraft.common.blocks.RailcraftTileEntity;
 import mods.railcraft.common.plugins.forge.LocalizationPlugin;
 import mods.railcraft.common.util.inventory.filters.StackFilters;
@@ -46,6 +47,8 @@ public class StandaloneInventory implements IInventory, IInventoryObject, IInven
     private final Callback callback;
     private final ItemStack[] contents;
     private int inventoryStackLimit = 64;
+    @Nullable
+    private Boolean isEmpty = Boolean.TRUE;
 
     public StandaloneInventory(int size, @Nullable String name, @Nullable IInventory callback) {
         this.name = name;
@@ -59,6 +62,12 @@ public class StandaloneInventory implements IInventory, IInventoryObject, IInven
         this.callback = callback == null ? null : new TileCallback(callback);
     }
 
+    public StandaloneInventory(int size, @Nullable String name, @Nullable ITrackKitInstance callback) {
+        this.name = name;
+        contents = new ItemStack[size];
+        this.callback = callback == null ? null : new TrackKitCallback(callback);
+    }
+
     public StandaloneInventory(int size, @Nullable String name, @Nullable Callback callback) {
         this.name = name;
         contents = new ItemStack[size];
@@ -70,6 +79,10 @@ public class StandaloneInventory implements IInventory, IInventoryObject, IInven
     }
 
     public StandaloneInventory(int size, @Nullable RailcraftTileEntity callback) {
+        this(size, null, callback);
+    }
+
+    public StandaloneInventory(int size, @Nullable ITrackKitInstance callback) {
         this(size, null, callback);
     }
 
@@ -101,6 +114,7 @@ public class StandaloneInventory implements IInventory, IInventoryObject, IInven
     }
 
     @Override
+    @Nullable
     public ItemStack getStackInSlot(int i) {
         return contents[i];
     }
@@ -178,6 +192,7 @@ public class StandaloneInventory implements IInventory, IInventoryObject, IInven
 
     @Override
     public void markDirty() {
+        isEmpty = null;
         if (callback != null) {
             callback.markDirty();
         }
@@ -223,7 +238,7 @@ public class StandaloneInventory implements IInventory, IInventoryObject, IInven
     }
 
     @Override
-    public boolean isItemValidForSlot(int i, ItemStack itemstack) {
+    public boolean isItemValidForSlot(int i, @Nullable ItemStack itemstack) {
         return true;
     }
 
@@ -257,6 +272,16 @@ public class StandaloneInventory implements IInventory, IInventoryObject, IInven
     @Override
     public Iterator<IInventoryObject> iterator() {
         return Iterators.singletonIterator(this);
+    }
+
+    public boolean isEmpty() {
+        if (isEmpty != null)
+            return isEmpty;
+        for (ItemStack stack : contents) {
+            if (!InvTools.isEmpty(stack))
+                return isEmpty = false;
+        }
+        return isEmpty = true;
     }
 
     public abstract static class Callback {
@@ -340,6 +365,30 @@ public class StandaloneInventory implements IInventory, IInventoryObject, IInven
         @Override
         public String getName() {
             return tile.getName();
+        }
+
+        @Override
+        public Boolean hasCustomName() {
+            return true;
+        }
+    }
+
+    private static class TrackKitCallback extends Callback {
+
+        private final ITrackKitInstance instance;
+
+        TrackKitCallback(ITrackKitInstance instance) {
+            this.instance = instance;
+        }
+
+        @Override
+        public void markDirty() {
+            instance.markDirty();
+        }
+
+        @Override
+        public String getName() {
+            return ((RailcraftTileEntity) instance.getTile()).getName();
         }
 
         @Override

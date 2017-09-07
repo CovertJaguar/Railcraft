@@ -53,8 +53,13 @@ public class TileTrackOutfitted extends RailcraftTileEntity implements IOutfitte
     }
 
     @Override
+    protected void setWorldCreate(World worldIn) {
+        setWorldObj(worldIn);
+    }
+
+    @Override
     public String getLocalizationTag() {
-        return "tile." + trackKitInstance.getTrackKit().getName().replace(':', '.') + ".name";
+        return trackKitInstance.getTrackKit().getLocalizationTag();
     }
 
     @Nonnull
@@ -135,5 +140,10 @@ public class TileTrackOutfitted extends RailcraftTileEntity implements IOutfitte
     @Override
     public boolean shouldRefresh(World world, BlockPos pos, @Nonnull IBlockState oldState, @Nonnull IBlockState newSate) {
         return oldState.getBlock() != newSate.getBlock();
+    }
+
+    @Override
+    public void setWorldObj(World worldIn) {
+        super.setWorldObj(worldIn);
     }
 }

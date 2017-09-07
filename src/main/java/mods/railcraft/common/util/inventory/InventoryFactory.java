@@ -26,6 +26,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
+import java.util.function.Predicate;
 
 /**
  * Created by CovertJaguar on 5/28/2017 for Railcraft.
@@ -47,7 +48,7 @@ public class InventoryFactory {
     }
 
     @Nullable
-    public static IInventoryObject get(World world, BlockPos pos, EnumFacing side, java.util.function.Predicate<TileEntity> filter) {
+    public static IInventoryObject get(World world, BlockPos pos, EnumFacing side, Predicate<TileEntity> filter) {
         TileEntity tile = WorldPlugin.getBlockTile(world, pos.offset(side));
         if (!(tile instanceof IInventory) || !filter.test(tile))
             return null;

@@ -35,6 +35,8 @@ import mods.railcraft.common.blocks.tracks.outfitted.kits.TrackKitPriming;
 import mods.railcraft.common.blocks.tracks.outfitted.kits.TrackKitRouting;
 import mods.railcraft.common.carts.*;
 import mods.railcraft.common.gui.EnumGui;
+import mods.railcraft.common.gui.containers.ContainerTrackDumping;
+import mods.railcraft.common.gui.containers.FactoryContainer;
 import mods.railcraft.common.plugins.forge.LocalizationPlugin;
 import mods.railcraft.common.util.misc.Game;
 import mods.railcraft.common.util.routing.IRouter;
@@ -42,14 +44,20 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Level;
+
+import javax.annotation.Nullable;
 
 /**
  * @author CovertJaguar <http://www.railcraft.info>
  */
+@SideOnly(Side.CLIENT)
 public class FactoryGui {
 
-    public static GuiScreen build(EnumGui gui, InventoryPlayer inv, Object obj, World world, int x, int y, int z) {
+    @Nullable
+    public static GuiScreen build(EnumGui gui, InventoryPlayer inv, @Nullable Object obj, World world, int x, int y, int z) {
         if (gui != EnumGui.ANVIL && obj == null)
             return null;
 
@@ -172,7 +180,12 @@ public class FactoryGui {
                     return new GuiLocomotiveElectric(inv, (EntityLocomotiveElectric) obj);
                 case LOCO_CREATIVE:
                     return new GuiLocomotiveCreative(inv, (EntityLocomotiveCreative) obj);
+                case TRACK_DUMPING:
+                    return new GuiTrackDumping((ContainerTrackDumping) FactoryContainer.build(gui, inv, obj, world, x, y, z));
                 default:
+                    Game.log(Level.ERROR, "Failed to retrieve a gui {0} at ({1},{2},{3})!", gui, x, y, z);
+                    if (Game.DEVELOPMENT_ENVIRONMENT)
+                        throw new RuntimeException("Building gui " + gui + " failed at x=" + x + ", y=" + y + ", z=" + z);
                     //TODO: Fix this
 //                    return RailcraftModuleManager.getGuiScreen(gui, inv, obj, world, x, y, z);
             }

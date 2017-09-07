@@ -24,6 +24,7 @@ import mods.railcraft.common.blocks.machine.interfaces.ITileAspectResponder;
 import mods.railcraft.common.blocks.machine.manipulator.*;
 import mods.railcraft.common.blocks.machine.worldspike.TileWorldspike;
 import mods.railcraft.common.blocks.tracks.outfitted.TileTrackOutfitted;
+import mods.railcraft.common.blocks.tracks.outfitted.kits.TrackKitDumping;
 import mods.railcraft.common.blocks.tracks.outfitted.kits.TrackKitRouting;
 import mods.railcraft.common.carts.*;
 import mods.railcraft.common.gui.EnumGui;
@@ -144,7 +145,12 @@ public class FactoryContainer {
                     return new ContainerRouting(inv, (IRouter) obj);
                 case TRACK_ROUTING:
                     return new ContainerTrackRouting(inv, (TrackKitRouting) ((TileTrackOutfitted) obj).getTrackKitInstance());
+                case TRACK_DUMPING:
+                    return new ContainerTrackDumping(inv, (TrackKitDumping) ((TileTrackOutfitted) obj).getTrackKitInstance());
                 default:
+                    Game.log(Level.ERROR, "Failed to retrieve a gui container {0} at ({1},{2},{3})!", gui, x, y, z);
+                    if (Game.DEVELOPMENT_ENVIRONMENT)
+                        throw new RuntimeException("Building container " + gui + " failed at x=" + x + ", y=" + y + ", z=" + z);
                     //TODO: fix this
 //                    return RailcraftModuleManager.getGuiContainer(gui, inv, obj, world, x, y, z);
             }
