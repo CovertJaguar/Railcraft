@@ -54,4 +54,8 @@ public class SimpleCube {
         return false;
     }
 
+    public boolean isBeaconBase(IBlockAccess worldObj, BlockPos pos, BlockPos beacon) {
+        return false;
+    }
+
 }

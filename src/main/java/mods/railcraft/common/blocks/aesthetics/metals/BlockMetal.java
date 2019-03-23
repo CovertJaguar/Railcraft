@@ -187,4 +187,9 @@ public class BlockMetal extends BlockRailcraftSubtyped<EnumMetal> {
     public boolean isFlammable(IBlockAccess world, BlockPos pos, EnumFacing face) {
         return getVariant(world, pos).getBlockDef().isFlammable(world, pos, face);
     }
+
+    @Override
+    public boolean isBeaconBase(IBlockAccess world, BlockPos pos, BlockPos beacon) {
+        return getVariant(world, pos).getBlockDef().isBeaconBase(world, pos, beacon);
+    }
 }

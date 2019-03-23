@@ -544,4 +544,19 @@ public class BlockTrackOutfitted extends BlockTrackTile<TileTrackOutfitted> impl
         else
             return Collections.emptyMap();
     }
+
+    @Override
+    public boolean canBeConnectedTo(IBlockAccess world, BlockPos pos, EnumFacing facing) {
+        TileEntity tile = WorldPlugin.getBlockTile(world, pos);
+        try {
+            if (tile instanceof TileTrackOutfitted) {
+                ITrackKitInstance track = ((TileTrackOutfitted) tile).getTrackKitInstance();
+                if (track instanceof ITrackKitConnectible)
+                    return ((ITrackKitConnectible) track).canBeConnectedTo(facing);
+            }
+        } catch (Error error) {
+            Game.log().api(Railcraft.MOD_ID, error, ITrackKitInstance.class, ITrackKitConnectible.class);
+        }
+        return super.canBeConnectedTo(world, pos, facing);
+    }
 }

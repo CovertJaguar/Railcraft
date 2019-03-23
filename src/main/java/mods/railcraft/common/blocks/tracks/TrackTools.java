@@ -258,6 +258,21 @@ public final class TrackTools {
 //        return Optional.ofNullable(tile);
 //    }
 
+    public static EnumFacing.Axis getAxisForShape(EnumRailDirection shape) {
+        switch (shape) {
+            case NORTH_SOUTH:
+            case ASCENDING_NORTH:
+            case ASCENDING_SOUTH:
+                return Axis.Z;
+            case EAST_WEST:
+            case ASCENDING_EAST:
+            case ASCENDING_WEST:
+                return Axis.X;
+            default:
+                throw new IllegalArgumentException("No corresponding axis for turns");
+        }
+    }
+
     public static EnumRailDirection getAxisAlignedDirection(Axis axis) {
         switch (axis) {
             case X:

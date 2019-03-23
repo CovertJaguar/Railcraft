@@ -31,7 +31,6 @@ public class BlockPostMetalPlatform extends BlockPostMetalBase {
     }
 
     @Override
-
     protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, COLOR, NORTH, SOUTH, EAST, WEST);
     }
@@ -51,5 +50,10 @@ public class BlockPostMetalPlatform extends BlockPostMetalBase {
     @Override
     public boolean isPlatform(IBlockState state) {
         return true;
+    }
+
+    @Override
+    protected EnumPost getUnpaintedType() {
+        return EnumPost.METAL_PLATFORM_UNPAINTED;
     }
 }

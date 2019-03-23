@@ -10,6 +10,7 @@
 package mods.railcraft.common.blocks.tracks.outfitted.kits;
 
 import mods.railcraft.api.core.IPostConnection;
+import mods.railcraft.api.tracks.ITrackKitConnectible;
 import mods.railcraft.api.tracks.ITrackKitCustomShape;
 import mods.railcraft.api.tracks.ITrackKitMovementBlocker;
 import mods.railcraft.api.tracks.ITrackKitReversible;
@@ -39,7 +40,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class TrackKitGated extends TrackKitPowered implements ITrackKitReversible, ITrackKitCustomShape, IPostConnection, ITrackKitMovementBlocker {
+public class TrackKitGated extends TrackKitPowered implements ITrackKitReversible, ITrackKitCustomShape, IPostConnection, ITrackKitMovementBlocker, ITrackKitConnectible {
 
     private static final double MOTION_MIN = 0.2;
     private static final double AABB_SHRINK = -0.375;
@@ -217,4 +218,11 @@ public class TrackKitGated extends TrackKitPowered implements ITrackKitReversibl
         return !isGateOpen();
     }
 
+    @Override
+    public boolean canBeConnectedTo(EnumFacing facing) {
+        if (facing.getAxis().isVertical())
+            return false;
+        BlockRailBase.EnumRailDirection shape = TrackTools.getTrackDirectionRaw(theWorldAsserted(), getPos());
+        return TrackTools.getAxisForShape(shape) != facing.getAxis();
+    }
 }

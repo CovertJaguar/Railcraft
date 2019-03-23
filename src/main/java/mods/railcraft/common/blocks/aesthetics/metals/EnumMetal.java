@@ -23,16 +23,17 @@ import java.util.List;
 
 public enum EnumMetal implements IVariantEnumBlock<EnumMetal> {
 
-    BLOCK_COPPER(ModuleResources.class, "copper", new SimpleCube(), 3f, 10f),
-    BLOCK_TIN(ModuleResources.class, "tin", new SimpleCube(), 3f, 10f),
-    BLOCK_LEAD(ModuleResources.class, "lead", new SimpleCube(), 2f, 20f),
-    BLOCK_STEEL(ModuleResources.class, "steel", new SimpleCube(), 5f, 15f),
-    BLOCK_SILVER(ModuleResources.class, "silver", new SimpleCube(), 3f, 10f),
-    BLOCK_BRONZE(ModuleResources.class, "bronze", new SimpleCube(), 3f, 10f),
-    BLOCK_NICKEL(ModuleResources.class, "nickel", new SimpleCube(), 3f, 10f),
-    BLOCK_INVAR(ModuleResources.class, "invar", new SimpleCube(), 3f, 10f),
-    BLOCK_ZINC(ModuleResources.class, "zinc", new SimpleCube(), 3f, 10f),
-    BLOCK_BRASS(ModuleResources.class, "brass", new SimpleCube(), 3f, 10f),;
+    BLOCK_COPPER(ModuleResources.class, "copper", new MetalCube(), 3f, 10f),
+    BLOCK_TIN(ModuleResources.class, "tin", new MetalCube(), 3f, 10f),
+    BLOCK_LEAD(ModuleResources.class, "lead", new MetalCube(), 2f, 20f),
+    BLOCK_STEEL(ModuleResources.class, "steel", new MetalCube(), 5f, 15f),
+    BLOCK_SILVER(ModuleResources.class, "silver", new MetalCube(), 3f, 10f),
+    BLOCK_BRONZE(ModuleResources.class, "bronze", new MetalCube(), 3f, 10f),
+    BLOCK_NICKEL(ModuleResources.class, "nickel", new MetalCube(), 3f, 10f),
+    BLOCK_INVAR(ModuleResources.class, "invar", new MetalCube(), 3f, 10f),
+    BLOCK_ZINC(ModuleResources.class, "zinc", new MetalCube(), 3f, 10f),
+    BLOCK_BRASS(ModuleResources.class, "brass", new MetalCube(), 3f, 10f),
+    ;
     public static final EnumMetal[] VALUES = values();
     private static final List<EnumMetal> creativeList = new ArrayList<>();
 

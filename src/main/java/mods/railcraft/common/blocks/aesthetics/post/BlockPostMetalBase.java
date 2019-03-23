@@ -11,6 +11,7 @@ package mods.railcraft.common.blocks.aesthetics.post;
 
 import mods.railcraft.api.core.IPostConnection;
 import mods.railcraft.api.core.IVariantEnum;
+import mods.railcraft.common.blocks.RailcraftBlocks;
 import mods.railcraft.common.blocks.interfaces.IBlockColored;
 import mods.railcraft.common.plugins.color.ColorPlugin;
 import mods.railcraft.common.plugins.color.EnumColor;
@@ -34,9 +35,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author CovertJaguar <http://www.railcraft.info>
@@ -108,10 +106,10 @@ public abstract class BlockPostMetalBase extends BlockPostBase implements ColorP
     @SuppressWarnings("deprecation")
     @Override
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
-        state = state.withProperty(NORTH, PostConnectionHelper.connect(worldIn, pos, state, EnumFacing.NORTH));
-        state = state.withProperty(SOUTH, PostConnectionHelper.connect(worldIn, pos, state, EnumFacing.SOUTH));
-        state = state.withProperty(EAST, PostConnectionHelper.connect(worldIn, pos, state, EnumFacing.EAST));
-        state = state.withProperty(WEST, PostConnectionHelper.connect(worldIn, pos, state, EnumFacing.WEST));
+        state = state.withProperty(NORTH, PostConnectionHelper.connectMetalPost(worldIn, pos, state, EnumFacing.NORTH));
+        state = state.withProperty(SOUTH, PostConnectionHelper.connectMetalPost(worldIn, pos, state, EnumFacing.SOUTH));
+        state = state.withProperty(EAST, PostConnectionHelper.connectMetalPost(worldIn, pos, state, EnumFacing.EAST));
+        state = state.withProperty(WEST, PostConnectionHelper.connectMetalPost(worldIn, pos, state, EnumFacing.WEST));
         return super.getActualState(state, worldIn, pos);
     }
 
@@ -145,18 +143,16 @@ public abstract class BlockPostMetalBase extends BlockPostBase implements ColorP
         return true;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-        List<ItemStack> list = new ArrayList<>();
-        // TODO: Drop rusty
-//        if (isPlatform)
-//            list.add(EnumPost.METAL_PLATFORM_UNPAINTED.getStack());
-//        else
-//            list.add(EnumPost.METAL_UNPAINTED.getStack());
-        list.add(getStack(1, EnumColor.BLACK));
-        return list;
+    public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+        if (RailcraftBlocks.POST.isLoaded()) {
+            drops.add(RailcraftBlocks.POST.getStack(getUnpaintedType()));
+            return;
+        }
+        drops.add(getStack(1, EnumColor.BLACK));
     }
+
+    protected abstract EnumPost getUnpaintedType();
 
     @Override
     public boolean recolorBlock(World world, BlockPos pos, EnumFacing side, EnumDyeColor color) {
@@ -167,8 +163,6 @@ public abstract class BlockPostMetalBase extends BlockPostBase implements ColorP
         }
         return false;
     }
-
-
 
     /**
      * Get the MapColor for this Block and the given BlockState

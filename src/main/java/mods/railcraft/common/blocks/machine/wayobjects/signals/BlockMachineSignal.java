@@ -10,11 +10,14 @@
 
 package mods.railcraft.common.blocks.machine.wayobjects.signals;
 
+import mods.railcraft.api.core.IPostConnection;
 import mods.railcraft.api.core.RailcraftConstantsAPI;
 import mods.railcraft.client.util.textures.TextureAtlasSheet;
+import mods.railcraft.common.blocks.aesthetics.post.BlockPostBase;
 import mods.railcraft.common.blocks.machine.BlockMachine;
 import mods.railcraft.common.blocks.machine.IEnumMachine;
 import mods.railcraft.common.plugins.forge.WorldPlugin;
+import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
@@ -107,27 +110,35 @@ public abstract class BlockMachineSignal<V extends Enum<V> & IEnumMachine<V>> ex
         state = super.getActualState(state, worldIn, pos);
         Optional<TileSignalBase> tile = WorldPlugin.getTileEntity(worldIn, pos, TileSignalBase.class);
         tile.ifPresent(t -> t.getTileCache().resetTimers());
-        state = state.withProperty(FRONT, tile.map(TileSignalBase::getFacing).orElse(EnumFacing.NORTH));
+        EnumFacing front = tile.map(TileSignalBase::getFacing).orElse(EnumFacing.NORTH);
+        state = state.withProperty(FRONT, front);
         if (state.getProperties().containsKey(CONNECTION_DOWN))
-            state = state.withProperty(CONNECTION_DOWN, canConnectDown(state, worldIn, pos));
-//        state = state.withProperty(CONNECTION_NORTH, tile.map(t -> t.isConnected(EnumFacing.NORTH)).orElse(false));
-//        state = state.withProperty(CONNECTION_EAST, tile.map(t -> t.isConnected(EnumFacing.EAST)).orElse(false));
-//        state = state.withProperty(CONNECTION_SOUTH, tile.map(t -> t.isConnected(EnumFacing.SOUTH)).orElse(false));
-//        state = state.withProperty(CONNECTION_WEST, tile.map(t -> t.isConnected(EnumFacing.WEST)).orElse(false));
+            state = state.withProperty(CONNECTION_DOWN, canConnectDown(worldIn, pos));
+        state = state.withProperty(CONNECTION_NORTH, canConnectSide(worldIn, pos, EnumFacing.NORTH, front));
+        state = state.withProperty(CONNECTION_EAST, canConnectSide(worldIn, pos, EnumFacing.EAST, front));
+        state = state.withProperty(CONNECTION_SOUTH, canConnectSide(worldIn, pos, EnumFacing.SOUTH, front));
+        state = state.withProperty(CONNECTION_WEST, canConnectSide(worldIn, pos, EnumFacing.WEST, front));
         return state;
     }
 
-    private boolean canConnectDown(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
-        if (worldIn.isSideSolid(pos.down(), EnumFacing.UP, false))
-            return true;
+    private boolean canConnectDown(IBlockAccess worldIn, BlockPos pos) {
         BlockPos posDown = pos.down();
         IBlockState belowState = worldIn.getBlockState(posDown);
         return belowState.getBlock().canPlaceTorchOnTop(belowState, worldIn, pos);
     }
 
+    private boolean canConnectSide(IBlockAccess world, BlockPos fromPos, EnumFacing fromSide, EnumFacing front) {
+        if (fromSide == front)
+            return false;
+        IBlockState state = WorldPlugin.getBlockState(world, fromPos.offset(fromSide));
+        Block block = state.getBlock();
+        return block instanceof BlockPostBase;
+    }
+
     @Override
     public ConnectStyle connectsToPost(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing face) {
-        return ConnectStyle.TWO_THIN;
+        EnumFacing front = WorldPlugin.getTileEntity(world, pos, TileSignalBase.class).map(TileSignalBase::getFacing).orElse(EnumFacing.NORTH);
+        return face != front ? ConnectStyle.SINGLE_THICK : ConnectStyle.NONE;
     }
 
     @Override

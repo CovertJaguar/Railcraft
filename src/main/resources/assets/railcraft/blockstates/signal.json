@@ -1,13 +1,10 @@
 {
   "forge_marker": 1,
-  "defaults": {
-    "model": "railcraft:signal_single"
-  },
   "variants": {
-    "normal": [{}],
     "inventory": [
       {
         "transform": "forge:default-block",
+        "model": "railcraft:signal_single",
         "submodel": {
           "lamp": {"model": "railcraft:signal_single_lamp"},
           "con_down": {"model": "railcraft:signal_single_pillar"}
@@ -24,29 +21,93 @@
     },
     "connection_north": {
       "true": {
+        "submodel": {
+          "singleN": {
+            "model": "railcraft:post_single_bar",
+            "y": 0,
+            "textures": {
+              "texture": "railcraft:blocks/signal"
+            }
+          }
+        }
       },
       "false": {}
     },
     "connection_east": {
       "true": {
+        "submodel": {
+          "singleE": {
+            "model": "railcraft:post_single_bar",
+            "y": 90,
+            "textures": {
+              "texture": "railcraft:blocks/signal"
+            }
+          }
+        }
       },
       "false": {}
     },
     "connection_south": {
       "true": {
+        "submodel": {
+          "singleS": {
+            "model": "railcraft:post_single_bar",
+            "y": 180,
+            "textures": {
+              "texture": "railcraft:blocks/signal"
+            }
+          }
+        }
       },
       "false": {}
     },
     "connection_west": {
       "true": {
+        "submodel": {
+          "singleW": {
+            "model": "railcraft:post_single_bar",
+            "y": 270,
+            "textures": {
+              "texture": "railcraft:blocks/signal"
+            }
+          }
+        }
       },
       "false": {}
     },
     "front": {
-      "north": {},
-      "east": {"y": 90},
-      "south": {"y": 180},
-      "west": {"y": 270}
+      "north": {
+        "submodel": {
+          "body": {
+            "model": "railcraft:signal_single",
+            "y": 0
+          }
+        }
+      },
+      "east": {
+        "submodel": {
+          "body": {
+            "model": "railcraft:signal_single",
+            "y": 90
+          }
+        }
+      },
+      "south": {
+        "submodel": {
+          "body": {
+            "model": "railcraft:signal_single",
+            "y": 180
+          }
+        }
+      },
+      "west": {
+        "submodel": {
+          "body": {
+            "model": "railcraft:signal_single",
+            "y": 270
+          }
+        }
+      }
     }
   }
 }

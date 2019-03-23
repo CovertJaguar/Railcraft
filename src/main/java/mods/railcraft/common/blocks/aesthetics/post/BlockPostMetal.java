@@ -59,4 +59,9 @@ public class BlockPostMetal extends BlockPostMetalBase {
                 "I I",
                 'I', "ingotIron");
     }
+
+    @Override
+    protected EnumPost getUnpaintedType() {
+        return EnumPost.METAL_UNPAINTED;
+    }
 }

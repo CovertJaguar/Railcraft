@@ -124,18 +124,7 @@ public final class MiscTools {
     public static EnumFacing getHorizontalSideFacingPlayer(@Nullable EntityLivingBase player) {
         if (player == null)
             return EnumFacing.NORTH;
-        int dir = MathHelper.floor((double) ((player.rotationYaw * 4.0F) / 360.0F) + 0.5) & 3;
-        switch (dir) {
-            case 0:
-                return EnumFacing.NORTH;
-            case 1:
-                return EnumFacing.EAST;
-            case 2:
-                return EnumFacing.SOUTH;
-            case 3:
-                return EnumFacing.WEST;
-        }
-        return EnumFacing.NORTH;
+        return player.getHorizontalFacing().getOpposite();
     }
 
     public static @Nullable EnumFacing getSideFacingTrack(World world, BlockPos pos) {

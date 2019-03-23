@@ -29,9 +29,16 @@ public enum EnumPost implements IVariantEnumBlock<EnumPost> {
     WOOD_PLATFORM(MapColor.BROWN),
     STONE_PLATFORM(MapColor.STONE),
     METAL_PLATFORM_UNPAINTED(MapColor.NETHERRACK);
+
+    static {
+        WOOD.burnable = true;
+        WOOD_PLATFORM.burnable = true;
+    }
+
     public static final EnumPost[] VALUES = values();
     private final MapColor mapColor;
     private final Definition def;
+    boolean burnable = false;
 
     EnumPost(MapColor mapColor) {
         this.mapColor = mapColor;
@@ -49,12 +56,12 @@ public enum EnumPost implements IVariantEnumBlock<EnumPost> {
         return def;
     }
 
-    public final MapColor getMapColor() {
+    public MapColor getMapColor() {
         return mapColor;
     }
 
     public boolean canBurn() {
-        return this == WOOD || this == WOOD_PLATFORM;
+        return burnable;
     }
 
     @Override

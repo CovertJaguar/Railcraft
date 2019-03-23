@@ -10,6 +10,7 @@
 package mods.railcraft.common.blocks.aesthetics.post;
 
 import mods.railcraft.api.core.IPostConnection;
+import mods.railcraft.api.core.IPostConnection.ConnectStyle;
 import mods.railcraft.common.blocks.BlockRailcraft;
 import mods.railcraft.common.plugins.forge.CreativePlugin;
 import mods.railcraft.common.plugins.forge.WorldPlugin;
@@ -17,6 +18,7 @@ import mods.railcraft.common.util.misc.AABBFactory;
 import mods.railcraft.common.util.sounds.RailcraftSoundTypes;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.EnumFacing;
@@ -67,15 +69,15 @@ public abstract class BlockPostBase extends BlockRailcraft {
     }
 
     public Column getColumnStyle(IBlockAccess world, IBlockState state, BlockPos pos) {
-        if (world.isSideSolid(pos.down(), EnumFacing.UP, true) || PostConnectionHelper.connect(world, pos, state, EnumFacing.DOWN) != IPostConnection.ConnectStyle.NONE)
+        if (world.isSideSolid(pos.down(), EnumFacing.UP, true) || PostConnectionHelper.connectMetalPost(world, pos, state, EnumFacing.DOWN) != IPostConnection.ConnectStyle.NONE)
             return Column.FULL;
         BlockPos up = pos.up();
         IBlockState above = WorldPlugin.getBlockState(world, up);
-        if (above instanceof BlockPostBase)
+        if (above.getBlock() instanceof BlockPostBase)
             return Column.FULL;
         if (!isPlatform(state) && !WorldPlugin.isBlockAir(world, up, above))
             return Column.MINI;
-        return Column.NONE;
+        return Column.FULL;
     }
 
     public boolean isPlatform(IBlockState state) {
@@ -125,6 +127,14 @@ public abstract class BlockPostBase extends BlockRailcraft {
     }
 
     @Override
+    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
+        if (face.getAxis() == EnumFacing.Axis.Y) {
+            return BlockFaceShape.CENTER;
+        }
+        return BlockFaceShape.MIDDLE_POLE;
+    }
+
+    @Override
     public boolean canPlaceTorchOnTop(IBlockState state, IBlockAccess world, BlockPos pos) {
         return true;
     }
@@ -152,5 +162,11 @@ public abstract class BlockPostBase extends BlockRailcraft {
     @Override
     public boolean canCreatureSpawn(IBlockState state, IBlockAccess world, BlockPos pos, EntityLiving.SpawnPlacementType type) {
         return false;
+    }
+
+    @Override
+    public boolean canBeConnectedTo(IBlockAccess world, BlockPos pos, EnumFacing facing) {
+        BlockPos offset = pos.offset(facing);
+        return PostConnectionHelper.connectMetalPost(world, offset, WorldPlugin.getBlockState(world, offset), facing.getOpposite()) != ConnectStyle.NONE;
     }
 }
