@@ -11,8 +11,10 @@ package mods.railcraft.common.modules;
 
 import mods.railcraft.api.core.RailcraftModule;
 import mods.railcraft.common.blocks.RailcraftBlocks;
+import mods.railcraft.common.plugins.buildcraft.power.MjPlugin;
 import mods.railcraft.common.plugins.ic2.IC2Plugin;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.Loader;
 
 /**
  * @author CovertJaguar <http://www.railcraft.info>
@@ -23,6 +25,9 @@ public class ModuleSteam extends RailcraftModulePayload {
 
     public ModuleSteam() {
         add(
+                RailcraftBlocks.ENGINE_HOBBY,
+                RailcraftBlocks.ENGINE_LOW,
+                RailcraftBlocks.ENGINE_HIGH,
                 RailcraftBlocks.EQUIPMENT,
                 RailcraftBlocks.ADMIN_STEAM_PRODUCER,
                 RailcraftBlocks.BOILER_FIREBOX_FLUID,
@@ -31,6 +36,11 @@ public class ModuleSteam extends RailcraftModulePayload {
                 RailcraftBlocks.BOILER_TANK_PRESSURE_LOW
         );
         setEnabledEventHandler(new ModuleEventHandler() {
+            @Override
+            public void preInit() {
+                MjPlugin.LOADED = Loader.isModLoaded("buildcraftlib");
+            }
+
             @Override
             public void postInit() {
                 IC2Plugin.nerfSyntheticCoal();

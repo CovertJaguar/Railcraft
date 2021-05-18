@@ -3,16 +3,18 @@
   "defaults": {
     "model": "railcraft:tesr",
     "textures": {
-      "particle": "railcraft:blocks/chest_void"
+      "particle": "railcraft:blocks/engine_steam_hobby"
     }
   },
   "variants": {
     "inventory": [{"transform": "forge:default-block"}],
     "facing": {
+      "down": {},
+      "up": {},
       "north": {},
       "south": {},
-      "east": {},
-      "west": {}
+      "west": {},
+      "east": {}
     }
   }
 }

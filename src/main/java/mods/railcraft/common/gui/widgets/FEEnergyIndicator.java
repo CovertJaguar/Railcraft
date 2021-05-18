@@ -16,8 +16,8 @@ import net.minecraftforge.energy.IEnergyStorage;
  */
 public class FEEnergyIndicator extends IndicatorController {
 
-    private final IEnergyStorage energyStorage;
-    private int energy;
+    protected final IEnergyStorage energyStorage;
+    protected int energy;
 
     public FEEnergyIndicator(IEnergyStorage energyStorage) {
         this.energyStorage = energyStorage;

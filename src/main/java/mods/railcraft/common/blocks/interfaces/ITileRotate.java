@@ -10,8 +10,10 @@
 
 package mods.railcraft.common.blocks.interfaces;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.EnumFacing;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 
 /**

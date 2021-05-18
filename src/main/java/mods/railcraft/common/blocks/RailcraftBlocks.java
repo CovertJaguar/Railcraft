@@ -384,6 +384,9 @@ public enum RailcraftBlocks implements IRailcraftBlockContainer {
     ADMIN_STEAM_PRODUCER(BlockDef.build("admin_steam_producer", BlockAdminSteamProducer.class).defaultItem()),
     CHEST_METALS(BlockDef.build("chest_metals", BlockChestMetals.class).defaultItem()),
     CHEST_VOID(BlockDef.build("chest_void", BlockChestVoid.class).defaultItem()),
+    ENGINE_HOBBY(BlockDef.build("engine_steam_hobby", BlockEngine.class).block(() -> new BlockEngine("steam_hobby", TileEngineSteamHobby.class)).defaultItem()),
+    ENGINE_LOW(BlockDef.build("engine_steam_low", BlockEngine.class).block(() -> new BlockEngine("steam_low", TileEngineSteamLow.class)).defaultItem()),
+    ENGINE_HIGH(BlockDef.build("engine_steam_high", BlockEngine.class).block(() -> new BlockEngine("steam_high", TileEngineSteamHigh.class)).defaultItem()),
     // multiblocks
     COKE_OVEN(BlockDef.build("coke_oven", BlockCokeOvenSandy.class).defaultItem()),
     COKE_OVEN_RED(BlockDef.build("coke_oven_red", BlockCokeOvenRed.class).defaultItem()),

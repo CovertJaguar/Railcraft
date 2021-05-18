@@ -15,16 +15,17 @@ import mods.railcraft.common.fluids.Fluids;
 import mods.railcraft.common.fluids.tanks.FilteredTank;
 import mods.railcraft.common.gui.EnumGui;
 import mods.railcraft.common.gui.GuiHandler;
+import mods.railcraft.common.plugins.buildcraft.power.MjPlugin;
 import mods.railcraft.common.plugins.forge.FuelPlugin;
 import mods.railcraft.common.util.inventory.InvTools;
 import mods.railcraft.common.util.inventory.InventoryAdvanced;
 import mods.railcraft.common.util.inventory.ItemHandlerFactory;
+import mods.railcraft.common.util.inventory.filters.StackFilters;
 import mods.railcraft.common.util.inventory.wrappers.InventoryMapper;
 import mods.railcraft.common.util.misc.Game;
 import mods.railcraft.common.util.steam.IBoilerContainer;
 import mods.railcraft.common.util.steam.SolidFuelProvider;
 import mods.railcraft.common.util.steam.SteamBoiler;
-import mods.railcraft.common.util.steam.SteamConstants;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -44,15 +45,16 @@ import static mods.railcraft.common.util.inventory.InvTools.sizeOf;
  * @author CovertJaguar <http://www.railcraft.info>
  */
 public class TileEngineSteamHobby extends TileEngineSteam implements ISidedInventory, IBoilerContainer {
+    private static final long OUTPUT_MJ = 2 * MjPlugin.MJ;
+    private static final long CAPACITY = 10000 * MjPlugin.MJ;
+    private static final long RECEIVE = 300 * MjPlugin.MJ;
+    private static final long EXTRACT = 40 * MjPlugin.MJ;
 
     public static final byte SLOT_FUEL = 0;
     public static final byte SLOT_LIQUID_INPUT = 1;
     public static final byte SLOT_LIQUID_OUTPUT = 2;
-    private static final int OUTPUT_RF = 20;
-    private static final int STEAM_USED = SteamConstants.STEAM_PER_10RF * (OUTPUT_RF / 10);
     private static final float FUEL_PER_CONVERSION_MULTIPLIER = 1.25F;
     private static final byte TICKS_PER_BOILER_CYCLE = 20;
-    private static final byte TANK_WATER = 1;
     private static final int[] SLOTS = InvTools.buildSlotArray(0, 3);
     private static final int[] NO_SLOTS = new int[0];
     public final SteamBoiler boiler;
@@ -105,13 +107,13 @@ public class TileEngineSteamHobby extends TileEngineSteam implements ISidedInven
     }
 
     @Override
-    public int getMaxOutputRF() {
-        return OUTPUT_RF;
+    public long getMaxOutputMJ() {
+        return OUTPUT_MJ;
     }
 
     @Override
     public int steamUsedPerTick() {
-        return STEAM_USED;
+        return 10;
     }
 
     @Override
@@ -128,15 +130,13 @@ public class TileEngineSteamHobby extends TileEngineSteam implements ISidedInven
     @Override
     public void burn() {
         super.burn();
-        //FIXME
-//        if (clock % FluidTools.BUCKET_FILL_TIME == 0)
-//            FluidTools.drainContainers(this, inv, SLOT_LIQUID_INPUT, SLOT_LIQUID_OUTPUT);
+        if(clock % FluidTools.BUCKET_FILL_TIME == 0)
+            FluidTools.drainContainers(tankManager, inv, SLOT_LIQUID_INPUT, SLOT_LIQUID_OUTPUT);
 
         boiler.tick(1);
 
-        // FIXME the bucket filter is broken
-//        if (StackFilters.EMPTY_BUCKET.test(getStackInSlot(SLOT_FUEL)))
-//            invFuel.moveOneItemTo(invOutput, StackFilters.EMPTY_BUCKET);
+        if (StackFilters.EMPTY_BUCKET.test(getStackInSlot(SLOT_FUEL)))
+            invFuel.moveOneItemTo(invOutput, StackFilters.EMPTY_BUCKET);
     }
 
     @Override
@@ -183,13 +183,18 @@ public class TileEngineSteamHobby extends TileEngineSteam implements ISidedInven
     }
 
     @Override
-    public int maxEnergy() {
-        return 100000;
+    public long maxEnergy() {
+        return CAPACITY;
     }
 
     @Override
-    public int maxEnergyReceived() {
-        return 3000;
+    public long maxEnergyReceived() {
+        return RECEIVE;
+    }
+
+    @Override
+    public long maxEnergyExtracted() {
+        return EXTRACT;
     }
 
     @Override
@@ -221,7 +226,7 @@ public class TileEngineSteamHobby extends TileEngineSteam implements ISidedInven
 
     @Override
     public int[] getSlotsForFace(EnumFacing side) {
-        if (getOrientation() == side)
+        if (getFacing() == side)
             return NO_SLOTS;
         return SLOTS;
     }

@@ -98,7 +98,7 @@ public abstract class TileEngineSteam extends TileEngine implements ISteamUser, 
 
     @Override
     public void burn() {
-        int output = 0;
+        long output = 0;
 
         if (getEnergyStage() != EnergyStage.OVERHEAT) {
             if (isPowered()) {
@@ -116,7 +116,7 @@ public abstract class TileEngineSteam extends TileEngine implements ISteamUser, 
             if (isPowered()) {
                 if (steamUsed >= steamUsedPerTick()) {
                     steamUsed -= steamUsedPerTick();
-                    output = getMaxOutputRF();
+                    output = getMaxOutputMJ();
                     addEnergy(output);
                 }
             } else {
@@ -125,7 +125,7 @@ public abstract class TileEngineSteam extends TileEngine implements ISteamUser, 
             }
         }
 
-        currentOutput = (currentOutput * 74 + output) / 75f;
+        currentOutput = (currentOutput * 74D + output) / 75D;
     }
 
     @Override
@@ -138,12 +138,7 @@ public abstract class TileEngineSteam extends TileEngine implements ISteamUser, 
         getTankManager().drain(TANK_STEAM, 5, true);
     }
 
-    @Override
-    public final int maxEnergyExtracted() {
-        return getMaxOutputRF() * 8;
-    }
-
-    public abstract int getMaxOutputRF();
+    public abstract long getMaxOutputMJ();
 
     public abstract int steamUsedPerTick();
 
@@ -170,13 +165,13 @@ public abstract class TileEngineSteam extends TileEngine implements ISteamUser, 
 
     @Override
     public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-        return (getOrientation() != facing && capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) || super.hasCapability(capability, facing);
+        return getFacing() != facing && capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY || super.hasCapability(capability, facing);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-        if (getOrientation() != facing && capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
+        if (getFacing() != facing && capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)
             return (T) getTankManager();
         return super.getCapability(capability, facing);
     }

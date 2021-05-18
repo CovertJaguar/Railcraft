@@ -23,14 +23,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ContainerEngineSteam extends RailcraftContainer {
 
     private final TileEngineSteam tile;
-    private float lastOutput;
+    private double lastOutput;
 
     public ContainerEngineSteam(InventoryPlayer inventoryplayer, TileEngineSteam tile) {
         this.tile = tile;
 
         addWidget(new FluidGaugeWidget(tile.getTankManager().get(0), 71, 23, 176, 0, 16, 47));
 
-        addWidget(new IndicatorWidget(tile.rfIndicator, 94, 25, 176, 47, 6, 43));
+        addWidget(new IndicatorWidget(tile.mjIndicator, 94, 25, 176, 47, 6, 43));
 
         for (int i = 0; i < 3; i++) {
             for (int k = 0; k < 9; k++) {
@@ -47,7 +47,7 @@ public class ContainerEngineSteam extends RailcraftContainer {
     public void addListener(IContainerListener crafter) {
         super.addListener(crafter);
 
-        crafter.sendWindowProperty(this, 14, Math.round(tile.currentOutput * 100));
+        crafter.sendWindowProperty(this, 14, (int) Math.round(tile.currentOutput * 100));
     }
 
     @Override
@@ -56,7 +56,7 @@ public class ContainerEngineSteam extends RailcraftContainer {
 
         for (IContainerListener crafter : listeners) {
             if (lastOutput != tile.currentOutput)
-                crafter.sendWindowProperty(this, 14, Math.round(tile.currentOutput * 100));
+                crafter.sendWindowProperty(this, 14, (int) Math.round(tile.currentOutput * 100));
         }
 
         this.lastOutput = tile.currentOutput;
@@ -65,10 +65,8 @@ public class ContainerEngineSteam extends RailcraftContainer {
     @Override
     @SideOnly(Side.CLIENT)
     public void updateProgressBar(int id, int value) {
-        switch (id) {
-            case 14:
-                tile.currentOutput = value / 100f;
-                break;
+        if (id == 14) {
+            tile.currentOutput = value / 100D;
         }
     }
 

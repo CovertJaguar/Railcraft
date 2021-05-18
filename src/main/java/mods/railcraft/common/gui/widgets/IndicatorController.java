@@ -24,7 +24,6 @@ public abstract class IndicatorController implements IIndicatorController {
         public void refresh() {
             refreshToolTip();
         }
-
     };
     protected final ToolTipLine tip = new ToolTipLine();
 

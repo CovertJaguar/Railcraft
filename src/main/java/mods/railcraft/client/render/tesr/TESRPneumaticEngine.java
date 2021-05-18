@@ -14,10 +14,11 @@ import mods.railcraft.client.render.models.programmatic.engine.ModelEngineFrame;
 import mods.railcraft.client.render.models.programmatic.engine.ModelEnginePiston;
 import mods.railcraft.client.render.models.programmatic.engine.ModelEngineTrunk;
 import mods.railcraft.client.render.tools.OpenGL;
-import mods.railcraft.common.blocks.machine.IEnumMachine;
 import mods.railcraft.common.blocks.single.TileEngine;
 import mods.railcraft.common.blocks.single.TileEngine.EnergyStage;
 import mods.railcraft.common.core.RailcraftConstants;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumFacing;
@@ -43,27 +44,20 @@ public final class TESRPneumaticEngine extends TileEntitySpecialRenderer<TileEng
         angleMap[EnumFacing.NORTH.ordinal()] = (float) -Math.PI / 2;
     }
 
-    public TESRPneumaticEngine(IEnumMachine<?> machineType) {
-        this.texture = new ResourceLocation(RailcraftConstants.TESR_TEXTURE_FOLDER + machineType.getBaseTag());
-        final Item type = null; //TODO
-//        ForgeHooksClient.registerTESRItemStack(machineType.getStack().getItem(), machineType.ordinal(), machineType.getTileClass());
+    public TESRPneumaticEngine(String tag) {
+        this.texture = new ResourceLocation(RailcraftConstants.TESR_TEXTURE_FOLDER + tag + ".png");
     }
 
     @Override
-    public void render(@Nullable TileEngine engine, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        //TODO
-        render(engine.getEnergyStage(), engine.getProgress(), engine.getOrientation(), x, y, z);
+    public void render(TileEngine engine, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+        render(engine.getEnergyStage(), engine.getProgress(), engine.getFacing(), x, y, z);
     }
 
     private void render(EnergyStage stage, float progress, EnumFacing orientation, double x, double y, double z) {
-        OpenGL.glPushMatrix();
-        OpenGL.glPushAttrib(GL11.GL_ENABLE_BIT);
-        OpenGL.glEnable(GL11.GL_LIGHTING);
-        OpenGL.glDisable(GL11.GL_BLEND);
-        OpenGL.glEnable(GL11.GL_CULL_FACE);
-        OpenGL.glColor3f(1, 1, 1);
+        GlStateManager.color(1, 1, 1);
+        GlStateManager.pushMatrix();
 
-        OpenGL.glTranslatef((float) x, (float) y, (float) z);
+        GlStateManager.translate((float) x, (float) y, (float) z);
 
         float[] angle = {0, 0, 0};
         float[] translate = {orientation.getXOffset(), orientation.getYOffset(), orientation.getZOffset()};
@@ -98,23 +92,20 @@ public final class TESRPneumaticEngine extends TileEntitySpecialRenderer<TileEng
             step = progress * 2F * 7.99F;
         }
         float frameTrans = step / 16;
-        OpenGL.glTranslatef(translate[0] * frameTrans, translate[1] * frameTrans, translate[2] * frameTrans);
+        GlStateManager.translate(translate[0] * frameTrans, translate[1] * frameTrans, translate[2] * frameTrans);
         frame.render(factor);
-        OpenGL.glTranslatef(-translate[0] * frameTrans, -translate[1] * frameTrans, -translate[2] * frameTrans);
+        GlStateManager.translate(-translate[0] * frameTrans, -translate[1] * frameTrans, -translate[2] * frameTrans);
 
         float pistonPrep = 0.01f;
-        OpenGL.glTranslatef(-translate[0] * pistonPrep, -translate[1] * pistonPrep, -translate[2] * pistonPrep);
+        GlStateManager.translate(-translate[0] * pistonPrep, -translate[1] * pistonPrep, -translate[2] * pistonPrep);
 
         float pistonTrans = 2F / 16F;
 
-        OpenGL.glDisable(GL11.GL_LIGHTING);
         for (int i = 0; i <= step + 2; i += 2) {
             piston.render(factor);
-            OpenGL.glTranslatef(translate[0] * pistonTrans, translate[1] * pistonTrans, translate[2] * pistonTrans);
+            GlStateManager.translate(translate[0] * pistonTrans, translate[1] * pistonTrans, translate[2] * pistonTrans);
         }
 
-        OpenGL.glPopAttrib();
-        OpenGL.glPopMatrix();
+        GlStateManager.popMatrix();
     }
-
 }

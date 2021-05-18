@@ -25,6 +25,9 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.init.Items;
 import net.minecraft.item.*;
+import net.minecraftforge.common.ForgeModContainer;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.UniversalBucket;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 
 import javax.annotation.Nullable;
@@ -69,19 +72,19 @@ public enum StackFilters implements Predicate<ItemStack> {
         }
 
     },
-    //    EMPTY_BUCKET {
-//        @Override
-//        protected boolean testType(ItemStack stack) {
-//            if (stack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null))
-//                return true;
-//            if (InvTools.isItem(stack, Items.BUCKET))
-//                return true;
-//            UniversalBucket uBucket = ForgeModContainer.getInstance().universalBucket;
-//            FluidStack fluidStack;
-//            return uBucket != null && of(UniversalBucket.class).test(stack) && (fluidStack = uBucket.getFluid(stack)) != null && fluidStack.amount <= 0;
-//        }
-//
-//    },
+    EMPTY_BUCKET {
+        @Override
+        protected boolean testType(ItemStack stack) {
+            if (stack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null))
+                return true;
+           if (InvTools.isItem(stack, Items.BUCKET))
+                return true;
+            UniversalBucket uBucket = ForgeModContainer.getInstance().universalBucket;
+            FluidStack fluidStack;
+            return uBucket != null && of(UniversalBucket.class).test(stack) && (fluidStack = uBucket.getFluid(stack)) != null && fluidStack.amount <= 0;
+        }
+
+    },
     FLUID_CONTAINER {
         @Override
         protected boolean testType(ItemStack stack) {
